@@ -74,8 +74,8 @@ fun LayarTPI() {
                 }
             }
         )
-        Spacer(Modifier.height(12.dp))
-        Text("Ringkasan harian", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(20.dp))
+        Text("Ringkasan Penjualan", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 BarisRingkasan("Total berat", "%.2f kg".format(ringkasan.totalBerat))
@@ -87,11 +87,14 @@ fun LayarTPI() {
                 BarisRingkasan("Nilai terbesar", ringkasan.jenisTerbesar)
             }
         }
-        Spacer(Modifier.height(8.dp))
-        Text("Daftar penjualan (${daftar.size})", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(16.dp))
+        Text("Riwayat Penjualan (${daftar.size})", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         if (daftar.isEmpty()) {
-            Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
-                Text("Belum ada penjualan. Tambahkan data pertama di atas.")
+            Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Image(painter = painterResource(R.drawable.ic_fish), contentDescription = "Ilustrasi ikan", modifier = Modifier.size(64.dp))
+                    Text(text = "Belum Ada Transaksi", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(text = "Tambahkan data penjualan ikan melalui formulir di atas.",style = MaterialTheme.typography.bodyMedium)}
             }
         } else {
             LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -141,9 +144,9 @@ fun FormulirPenjualan(
     valid: Boolean,
     onTambah: () -> Unit
 ) {
-    Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Tambah penjualan", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+Card( modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)) {
+    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text("Input Transaksi Penjualan", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Text("Jenis ikan")
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 listOf("Tongkol", "Tuna", "Kerapu", "Cumi").forEach { item ->
@@ -166,7 +169,7 @@ fun FormulirPenjualan(
             }
             if (mutu == "Kurang segar") Text("Harga otomatis dikurangi 25%.", color = MaterialTheme.colorScheme.error)
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            Button(onClick = onTambah, enabled = valid, modifier = Modifier.fillMaxWidth()) { Text("Tambah penjualan") }
+            Button(onClick = onTambah, enabled = valid, modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(12.dp)) {Text("Simpan Transaksi", fontWeight = FontWeight.Bold)}
         }
     }
 }
