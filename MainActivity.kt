@@ -42,6 +42,7 @@ fun LayarTPI() {
     var daftar by remember { mutableStateOf(listOf<PenjualanIkan>()) }
     val ringkasan = remember(daftar) { hitungRingkasan(daftar) }
     val valid = validasiPenjualan(jenis, berat, harga, mutu) == null
+    var itemAkanDihapus by remember { mutableStateOf<PenjualanIkan?>(null) }
 
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface).padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -95,11 +96,27 @@ fun LayarTPI() {
         } else {
             LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(daftar, key = { it.id }) { entri -> KartuPenjualan(entri, onHapus = {
-                    daftar = daftar.filterNot { it.id == entri.id }
+                    itemAkanDihapus = entri }
                 }) }
             }
         }
     }
+if (itemAkanDihapus != null) {
+    AlertDialog(
+        onDismissRequest = { itemAkanDihapus = null },
+        title = { Text("Konfirmasi Hapus") },
+        text = { Text("Apakah Anda yakin ingin menghapus data ${itemAkanDihapus?.jenis}?") },
+        confirmButton = {
+            TextButton(onClick = {
+                daftar = daftar.filterNot { it.id == itemAkanDihapus?.id }
+                itemAkanDihapus = null
+            }) { Text("Hapus") }
+        },
+        dismissButton = {
+            TextButton(onClick = { itemAkanDihapus = null }) { Text("Batal") }
+        }
+    )
+}
 }
 
 @Composable
