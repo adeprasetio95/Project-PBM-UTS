@@ -52,42 +52,27 @@ fun LayarTPI() {
             }
         }
         Spacer(Modifier.height(12.dp))
-        Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Tambah penjualan", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Text("Jenis ikan")
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    listOf("Tongkol", "Tuna", "Kerapu", "Cumi").forEach { item ->
-                        FilterChip(selected = jenis == item, onClick = { jenis = item; error = null },
-                            label = { Text(item) })
-                    }
+        FormulirPenjualan(
+            jenis = jenis,
+            onJenisChange = { jenis = it; error = null },
+            berat = berat,
+            onBeratChange = { berat = it; error = null },
+            harga = harga,
+            onHargaChange = { harga = it; error = null },
+            mutu = mutu,
+            onMutuChange = { mutu = it; error = null },
+            error = error,
+            valid = valid,
+            onTambah = {
+                val pesan = validasiPenjualan(jenis, berat, harga, mutu)
+                if (pesan != null) error = pesan else {
+                    daftar = daftar + PenjualanIkan(idBerikut, jenis,
+                        berat.replace(',', '.').toDouble(), harga.replace(',', '.').toDouble(), mutu)
+                    idBerikut++
+                    berat = ""; harga = ""; mutu = "Segar"; jenis = "Tongkol"; error = null
                 }
-                OutlinedTextField(value = berat, onValueChange = { berat = it; error = null },
-                    label = { Text("Berat (kg)") }, modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), singleLine = true)
-                OutlinedTextField(value = harga, onValueChange = { harga = it; error = null },
-                    label = { Text("Harga per kg (Rp)") }, modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), singleLine = true)
-                Text("Mutu ikan")
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("Segar", "Kurang segar").forEach { item ->
-                        FilterChip(selected = mutu == item, onClick = { mutu = item; error = null },
-                            label = { Text(item) })
-                    }
-                }
-                if (mutu == "Kurang segar") Text("Harga otomatis dikurangi 25%.", color = MaterialTheme.colorScheme.error)
-                error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                Button(onClick = {
-                    val pesan = validasiPenjualan(jenis, berat, harga, mutu)
-                    if (pesan != null) error = pesan else {
-                        daftar = daftar + PenjualanIkan(idBerikut, jenis,
-                            berat.replace(',', '.').toDouble(), harga.replace(',', '.').toDouble(), mutu)
-                        idBerikut++
-                        berat = ""; harga = ""; mutu = "Segar"; jenis = "Tongkol"; error = null
-                    }
-                }, enabled = valid, modifier = Modifier.fillMaxWidth()) { Text("Tambah penjualan") }
             }
-        }
+        )
         Spacer(Modifier.height(12.dp))
         Text("Ringkasan harian", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Card(Modifier.fillMaxWidth()) {
@@ -126,16 +111,45 @@ fun BarisRingkasan(label: String, nilai: String, tebal: Boolean = false) {
 }
 
 @Composable
-fun KartuPenjualan(entri: PenjualanIkan, onHapus: () -> Unit) {
-    val hasil = hitungPenjualan(entri)
+fun FormulirPenjualan(
+    jenis: String,
+    onJenisChange: (String) -> Unit,
+    berat: String,
+    onBeratChange: (String) -> Unit,
+    harga: String,
+    onHargaChange: (String) -> Unit,
+    mutu: String,
+    onMutuChange: (String) -> Unit,
+    error: String?,
+    valid: Boolean,
+    onTambah: () -> Unit
+) {
     Card(Modifier.fillMaxWidth()) {
-        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text("${entri.jenis} • ${entri.mutu}", fontWeight = FontWeight.Bold)
-                Text("%.2f kg × %s/kg".format(entri.beratKg, rupiah(hasil.hargaDisesuaikan)))
-                Text("Nilai: ${rupiah(hasil.nilaiPenjualan)}")
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Tambah penjualan", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text("Jenis ikan")
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                listOf("Tongkol", "Tuna", "Kerapu", "Cumi").forEach { item ->
+                    FilterChip(selected = jenis == item, onClick = { onJenisChange(item) },
+                        label = { Text(item) })
+                }
             }
-            TextButton(onClick = onHapus) { Text("Hapus") }
+            OutlinedTextField(value = berat, onValueChange = { onBeratChange(it) },
+                label = { Text("Berat (kg)") }, modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), singleLine = true)
+            OutlinedTextField(value = harga, onValueChange = { onHargaChange(it) },
+                label = { Text("Harga per kg (Rp)") }, modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), singleLine = true)
+            Text("Mutu ikan")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf("Segar", "Kurang segar").forEach { item ->
+                    FilterChip(selected = mutu == item, onClick = { onMutuChange(item) },
+                        label = { Text(item) })
+                }
+            }
+            if (mutu == "Kurang segar") Text("Harga otomatis dikurangi 25%.", color = MaterialTheme.colorScheme.error)
+            error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            Button(onClick = onTambah, enabled = valid, modifier = Modifier.fillMaxWidth()) { Text("Tambah penjualan") }
         }
     }
 }
