@@ -48,11 +48,11 @@ fun LayarTPI() {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Image(painterResource(R.drawable.ic_fish), contentDescription = "Ikon ikan", modifier = Modifier.size(44.dp))
             Column {
-                Text("TPI • Catatan Penjualan", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                Text("Hitung pendapatan bersih harian")
+                Text("TPI • Penjualan Ikan", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                Text("Pencatatan transaksi dan pendapatan harian", style = MaterialTheme.typography.bodyMedium)
             }
         }
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(16.dp))
         FormulirPenjualan(
             jenis = jenis,
             onJenisChange = { jenis = it; error = null },
