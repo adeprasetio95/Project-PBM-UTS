@@ -33,10 +33,10 @@ private fun rupiah(n: Double): String =
 
 @Composable
 fun LayarTPI() {
-    var jenis by remember { mutableStateOf("Tongkol") }
-    var berat by remember { mutableStateOf("") }
-    var harga by remember { mutableStateOf("") }
-    var mutu by remember { mutableStateOf("Segar") }
+    var jenis by rememberSaveable { mutableStateOf("Tongkol") }
+    var berat by rememberSaveable { mutableStateOf("") }
+    var harga by rememberSaveable { mutableStateOf("") }
+    var mutu by rememberSaveable { mutableStateOf("Segar") }
     var error by remember { mutableStateOf<String?>(null) }
     var idBerikut by remember { mutableIntStateOf(1) }
     var daftar by remember { mutableStateOf(listOf<PenjualanIkan>()) }
