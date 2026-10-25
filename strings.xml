@@ -1,10 +1,3 @@
 <resources>
-    <string name="app_name">TPI Penjualan Ikan</string>
-    <string name="app_title">TPI • Penjualan Ikan</string>
-    <string name="app_subtitle">Pencatatan transaksi dan pendapatan harian</string>
-    <string name="sales_summary">Ringkasan Penjualan</string>
-    <string name="sales_history">Riwayat Penjualan</string>
-    <string name="save_transaction">Simpan Transaksi</string>
-    <string name="empty_sales_title">Belum Ada Transaksi</string>
-    <string name="empty_sales_message">Tambahkan data penjualan ikan melalui formulir di atas.</string>
+    <string name="app_name">Catatan Penjualan Ikan TPI</string>
 </resources>
