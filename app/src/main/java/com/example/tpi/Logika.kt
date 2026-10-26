@@ -24,39 +24,57 @@ data class Ringkasan(
     val jenisTerbesar: String
 )
 
+enum class KesalahanValidasi {
+    JENIS, BERAT_ANGKA, HARGA_ANGKA, BERAT_RENTANG, HARGA_RENTANG, MUTU
+}
+
 fun hitungPenjualan(entri: PenjualanIkan): HasilPenjualan {
-    val harga = when (entri.mutu) {
+    val hargaDisesuaikan = when (entri.mutu) {
         "Kurang segar" -> entri.hargaPerKg * 0.75
         else -> entri.hargaPerKg
     }
-    return HasilPenjualan(harga, entri.beratKg * harga)
+    return HasilPenjualan(
+        hargaDisesuaikan = hargaDisesuaikan,
+        nilaiPenjualan = entri.beratKg * hargaDisesuaikan
+    )
 }
 
 fun hitungRingkasan(daftar: List<PenjualanIkan>): Ringkasan {
-    val nilai = daftar.map { it to hitungPenjualan(it).nilaiPenjualan }
+    val hasilPerEntri = daftar.map { entri -> entri to hitungPenjualan(entri) }
     val beratPerJenis = daftar.groupBy { it.jenis }
-        .mapValues { (_, item) -> item.sumOf { it.beratKg } }
-    val nilaiPerJenis = nilai.groupBy { it.first.jenis }
-        .mapValues { (_, item) -> item.sumOf { it.second } }
+        .mapValues { (_, entri) -> entri.sumOf { it.beratKg } }
+    val nilaiPerJenis = hasilPerEntri.groupBy { it.first.jenis }
+        .mapValues { (_, hasil) -> hasil.sumOf { it.second.nilaiPenjualan } }
     val totalBerat = daftar.sumOf { it.beratKg }
-    val kotor = nilai.sumOf { it.second }
-    val jenisTerbesar = nilaiPerJenis.maxByOrNull { it.value }?.key ?: "-"
-    val retribusi = kotor * 0.05
-    val pengepul = kotor * 0.10
-    return Ringkasan(totalBerat, kotor, retribusi, pengepul,
-        kotor - retribusi - pengepul, beratPerJenis, nilaiPerJenis, jenisTerbesar)
+    val pendapatanKotor = hasilPerEntri.sumOf { it.second.nilaiPenjualan }
+    val retribusi = pendapatanKotor * 0.05
+    val bagianPengepul = pendapatanKotor * 0.10
+    val jenisTerbesar = nilaiPerJenis.maxByOrNull { it.value }?.key ?: "Datanya Masih Kosong"
+    return Ringkasan(
+        totalBerat = totalBerat,
+        pendapatanKotor = pendapatanKotor,
+        retribusi = retribusi,
+        bagianPengepul = bagianPengepul,
+        pendapatanBersih = pendapatanKotor - retribusi - bagianPengepul,
+        beratPerJenis = beratPerJenis,
+        nilaiPerJenis = nilaiPerJenis,
+        jenisTerbesar = jenisTerbesar
+    )
 }
 
 fun validasiPenjualan(
-    jenis: String, beratTeks: String, hargaTeks: String, mutu: String
-): String? {
-    val berat = beratTeks.replace(',', '.').toDoubleOrNull()
-        ?: return "Berat harus berupa angka."
-    val harga = hargaTeks.replace(',', '.').toDoubleOrNull()
-        ?: return "Harga harus berupa angka."
-    if (jenis !in listOf("Tongkol", "Tuna", "Kerapu", "Cumi")) return "Pilih jenis ikan."
-    if (berat <= 0.0 || berat > 500.0) return "Berat harus lebih dari 0 dan maksimal 500 kg."
-    if (harga <= 0.0) return "Harga per kg harus lebih dari 0."
-    if (mutu !in listOf("Segar", "Kurang segar")) return "Pilih mutu ikan."
+    jenis: String,
+    beratTeks: String,
+    hargaTeks: String,
+    mutu: String
+): KesalahanValidasi? {
+    val berat = beratTeks.trim().replace(',', '.').toDoubleOrNull()
+        ?: return KesalahanValidasi.BERAT_ANGKA
+    val harga = hargaTeks.trim().replace(',', '.').toDoubleOrNull()
+        ?: return KesalahanValidasi.HARGA_ANGKA
+    if (jenis !in listOf("Tongkol", "Tuna", "Kerapu", "Cumi")) return KesalahanValidasi.JENIS
+    if (berat <= 0.0 || berat > 500.0) return KesalahanValidasi.BERAT_RENTANG
+    if (harga <= 0.0) return KesalahanValidasi.HARGA_RENTANG
+    if (mutu !in listOf("Segar", "Kurang segar")) return KesalahanValidasi.MUTU
     return null
 }
