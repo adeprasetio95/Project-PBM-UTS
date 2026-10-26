@@ -43,7 +43,6 @@ fun LayarTPI() {
     val database = remember { PenyimpananDatabase(context.applicationContext) }
     var daftar by remember { mutableStateOf(database.ambilSemua()) }
     val ringkasan = remember(daftar) { hitungRingkasan(daftar) }
-    val valid = validasiPenjualan(jenis, berat, harga, mutu) == null
 
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface).padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -80,14 +79,14 @@ fun LayarTPI() {
                 if (mutu == "Kurang segar") Text("Harga otomatis dikurangi 25%.", color = MaterialTheme.colorScheme.error)
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 Button(onClick = {
-                    val pesan = validasiPenjualan(jenis, berat, harga, mutu)
-                    if (pesan != null) error = pesan else {
+                    val kesalahan = validasiPenjualan(jenis, berat, harga, mutu)
+                    if (kesalahan != null) error = kesalahan.pesan() else {
                         val tersimpan = database.tambah(PenjualanIkan(0, jenis,
                             berat.replace(',', '.').toDouble(), harga.replace(',', '.').toDouble(), mutu))
                         daftar = listOf(tersimpan) + daftar
                         berat = ""; harga = ""; mutu = "Segar"; jenis = "Tongkol"; error = null
                     }
-                }, enabled = valid, modifier = Modifier.fillMaxWidth()) { Text("Tambah penjualan") }
+                }, modifier = Modifier.fillMaxWidth()) { Text("Tambah penjualan") }
             }
         }
         Spacer(Modifier.height(12.dp))
