@@ -78,3 +78,12 @@ fun validasiPenjualan(
     if (mutu !in listOf("Segar", "Kurang segar")) return KesalahanValidasi.MUTU
     return null
 }
+
+fun KesalahanValidasi.pesan(): String = when (this) {
+    KesalahanValidasi.JENIS -> "Jenis ikan tidak valid."
+    KesalahanValidasi.BERAT_ANGKA -> "Berat harus berupa angka."
+    KesalahanValidasi.HARGA_ANGKA -> "Harga harus berupa angka."
+    KesalahanValidasi.BERAT_RENTANG -> "Berat harus lebih dari 0 dan maksimal 500 kg."
+    KesalahanValidasi.HARGA_RENTANG -> "Harga harus lebih dari 0."
+    KesalahanValidasi.MUTU -> "Mutu tidak valid."
+}
