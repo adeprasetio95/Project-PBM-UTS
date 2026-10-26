@@ -87,6 +87,34 @@ fun LayarTPI() {
                 BarisRingkasan("Nilai terbesar", ringkasan.jenisTerbesar)
             }
         }
+
+        Text("Daftar penjualan (${daftar.size})", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+)
+
+if (daftar.isEmpty()) {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .weight(1f),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Belum ada penjualan. Tambahkan data pertama di atas.")
+    }
+} else {
+    LazyColumn(
+        Modifier.weight(1f),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(daftar, key = { it.id }) { entri ->
+            KartuPenjualan(entri, onHapus = {
+                database.hapus(entri.id)
+                daftar = daftar.filterNot {
+                    it.id == entri.id
+                }
+            })
+        }
+    }
+}
         Spacer(Modifier.height(16.dp))
         Text("Riwayat Penjualan (${daftar.size})", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         if (daftar.isEmpty()) {
